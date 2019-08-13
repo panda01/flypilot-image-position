@@ -72,8 +72,30 @@ function add_image_position_advanced_custom_fields() {
 endif;
 }
 
-function activate_flypilot_slideshow_plugin() {
-	add_image_position_advanced_custom_fields();
+function flypilot_print_image_markup($image_id, $extra_attrs) {
+	$all_image_sizes = get_intermediate_image_sizes();
+	$image_url = wp_get_attachment_url($image_id);
+	$image_metadata = wp_get_attachment_metadata($image_id);
+
+	$image_pos = get_field('image_position', $image_id);
+	if(!empty($image_pos)) {
+		$image_style = 'style="' . str_replace('_', ' ', $image_pos) . '" ';
+	} else {
+		$image_style = '';
+	}
+	// FIXME
+	// This should actually use sizes and srcset here
+	//
+	//
+	// $img_scrset = wp_calculate_image_srcset($all_image_sizes, $image_url, $image_metadata);
+	// $img_sizes = wp_calculate_image_sizes($all_image_sizes, $image_url, $image_metadata, $image_id);
+	// print_r($img_scrset);
+	// print_r($img_sizes);
+	// print_r($image_metadata);
+	$img_markup = '<img src="' . $image_url . '" ' . $image_style . $extra_attrs . ' />';
+	$responsive_img_markup = wp_image_add_srcset_and_sizes($img_markup, $image_metadata, $image_id);
+	return $responsive_img_markup;
 }
 
-add_action( 'init' ,'activate_flypilot_slideshow_plugin' );
+
+add_action( 'init' ,'add_image_position_advanced_custom_fields' );
